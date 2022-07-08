@@ -47,40 +47,75 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
   insert(key, value) {
     // Your code here
-    let inserted = 0;
+    if (this.count>= (0.7*this.capacity)){
+      this.resize();
+    }
     const pair= new KeyValuePair(key,value)
     const index= this.hashMod(key);
     if (this.data[index]){
       let curr= this.data[index];
 
-      while (curr.next){
+      while (curr){
         if (curr.key===key){
           curr.value= value;
-          inserted++;
+          return;
         }
         curr = curr.next;
       }
      }
-     if (inserted===0){
       this.insertWithHashCollisions(key, value);
-     }
   }
 
 
   read(key) {
-    // Your code here
     const index= this.hashMod(key);
-    return (this.data[index])
+    let curr = this.data[index];
+    // Your code here
+    while (curr){
+      if (curr.key===key){
+        return curr.value;
+      }
+      curr= curr.next;
   }
+  return undefined;
+}
 
 
   resize() {
-    // Your code here
+    const newTable= new HashTable (this.capacity*2);
+    for (let i=0;i<this.data.length;i++){
+      let kvp= this.data[i];
+      while (kvp){
+        newTable.insert(kvp.key, kvp.value);
+        kvp= kvp.next;
+      }
+    }
+    this.capacity= newTable.capacity;
+    this.data= newTable.data;
   }
 
 
   delete(key) {
     // Your code here
+    const index= this.hashMod(key);
+    if (this.data[index]){
+      let curr= this.data[index];
+      if (curr.key === key){
+        curr=curr.next;
+        this.data[index]= curr;
+        this.count -= 1;
+        return "hello";
+      }
+      while (curr.next){
+        if (curr.next.key===key){
+          curr.next=curr.next.next;
+          this.count -= 1;
+          return "goodbye";
+        }
+        curr = curr.next;
+      }
+     }
+     return "Key not found";
   }
 }
 
